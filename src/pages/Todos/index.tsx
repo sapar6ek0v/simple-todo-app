@@ -12,10 +12,6 @@ const Todos: FC = () => {
   const [todos, setTodos] = useState<Todo[]>(JSON.parse(localStorage.getItem('todos') as string) || []);
   const [todo, setTodo] = useState<string>('');
 
-  const saveToLocalStorage = (key: string, todos: Todo[]) => {
-    localStorage.setItem(key, JSON.stringify(todos));
-  };
-
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
@@ -33,27 +29,21 @@ const Todos: FC = () => {
   };
 
   useEffect(() => {
-    saveToLocalStorage('todos', todos)
+    localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
 
-  useEffect(() => {
-    setTodos(JSON.parse(localStorage.getItem('todos') as string));
-  }, []);
 
   const handleDeleteTodo = (id: number) => {
     const filteredTodos = todos.filter((todo) => todo.id !== id);
     setTodos(filteredTodos);
-    saveToLocalStorage('todos', filteredTodos);
   };
 
   const handleEditTodo = (id: number, newValue: string) => {
     const todo = todos.find((todo) => todo.id === id);
     if (!todo) return;
     const editedTodo = { ...todo, content: newValue };
-    const filteredTodos = todos.filter((todo) => todo.id !== editedTodo.id);
-    const newTodoList = [editedTodo, ...filteredTodos];
-    setTodos(newTodoList);
-    saveToLocalStorage('todos', newTodoList);
+    const updatedTodosList = todos.map((todo) => todo.id === id ? editedTodo : todo);
+    setTodos(updatedTodosList);
   };
 
   return (
