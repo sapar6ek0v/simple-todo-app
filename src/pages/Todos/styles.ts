@@ -76,3 +76,9 @@ export const List = styled.ul`
   margin: 0px;
   width: 100%;
 `;
+
+export const NoTodosTitle = styled.p`
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+`;

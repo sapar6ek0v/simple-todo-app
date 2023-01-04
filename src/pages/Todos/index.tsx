@@ -1,6 +1,6 @@
 import { FC, FormEvent, useEffect, useState } from 'react';
 import TodoItem from '../../components/TodoItem';
-import { Button, Group, Input, Stack, Wrapper, List } from './styles';
+import { Button, Group, Input, Stack, Wrapper, List, NoTodosTitle } from './styles';
 
 export type Todo = {
   id: number;
@@ -9,7 +9,7 @@ export type Todo = {
 };
 
 const Todos: FC = () => {
-  const [todos, setTodos] = useState<Todo[]>(JSON.parse(localStorage.getItem('todos') as string));
+  const [todos, setTodos] = useState<Todo[]>(JSON.parse(localStorage.getItem('todos') as string) || []);
   const [todo, setTodo] = useState<string>('');
 
   const saveToLocalStorage = (key: string, todos: Todo[]) => {
@@ -21,15 +21,20 @@ const Todos: FC = () => {
 
     if (!todo) return;
 
-    const newTodo: Todo = {
-      id: Date.now() + Math.random() * 1000,
-      content: todo,
-      createdAt: new Date(),
-    };
-    setTodos((prevState) => [newTodo, ...prevState]);
-    saveToLocalStorage('todos', todos);
+    setTodos([
+      ...todos,
+      {
+        id: Date.now() + Math.random() * 1000,
+        content: todo,
+        createdAt: new Date(),
+      }
+    ]);
     setTodo('');
   };
+
+  useEffect(() => {
+    saveToLocalStorage('todos', todos)
+  }, [todos]);
 
   useEffect(() => {
     setTodos(JSON.parse(localStorage.getItem('todos') as string));
@@ -68,9 +73,11 @@ const Todos: FC = () => {
 
         <List>
           {
-            todos.map((todo) => (
-              <TodoItem key={todo.id} todo={todo} onDelete={handleDeleteTodo} onEdit={handleEditTodo} />
-            ))
+            todos.length ?
+              todos.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} onDelete={handleDeleteTodo} onEdit={handleEditTodo} />
+              ))
+              : <NoTodosTitle>You don`t have any todos!</NoTodosTitle>
           }
         </List>
       </Stack>
